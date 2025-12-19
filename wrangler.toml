@@ -1,0 +1,11 @@
+name = "email-routing-monitor"
+main = "src/index.ts"
+compatibility_date = "2024-12-19"
+
+[triggers]
+crons = [ "30 2 * * *" ]
+
+[vars]
+ZONE_ID = "7193f0d358b5660b5e88906ff6713ea9"
+RESEND_FROM = "EmailRoutingMonitor <onboarding@resend.dev>"
+RESEND_TO = "muxiu1997@muxiu1997.com"
