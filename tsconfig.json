@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
     "target": "ESNext",
+    "jsx": "react-jsx",
     "lib": ["ESNext"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "types": ["./worker-configuration.d.ts"],
+    "types": ["./worker-configuration.d.ts", "node"],
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
