@@ -18,9 +18,11 @@
   "scripts": {
     "dev": "wrangler dev",
     "dev:email": "email dev -d src/emails",
-    "generate-types": "wrangler types",
+    "build": "tsdown",
     "type-check": "wrangler types && tsc --noEmit",
     "deploy": "wrangler deploy",
+    "deploy:dry": "wrangler deploy --dry-run --outdir dist",
+    "generate-types": "wrangler types",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "postinstall": "pnpm simple-git-hooks"
@@ -46,6 +48,7 @@
     "lint-staged": "16.2.7",
     "react-email": "5.1.0",
     "simple-git-hooks": "2.13.1",
+    "tsdown": "0.16.6",
     "typescript": "5.9.3",
     "wrangler": "4.56.0"
   },

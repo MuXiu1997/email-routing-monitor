@@ -1,5 +1,4 @@
 import type { EmailRoutingLog } from '../types'
-import process from 'node:process'
 import {
   Body,
   Container,
@@ -108,7 +107,7 @@ export function FailureNotificationEmail({
   )
 }
 
-if (process.env.NODE_ENV === 'development') {
+if (!import.meta?.env?.PROD) {
   FailureNotificationEmail.PreviewProps = {
     failures: [
       {
