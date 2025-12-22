@@ -21,7 +21,8 @@
     "type-check": "wrangler types && tsc --noEmit",
     "deploy": "wrangler deploy",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "postinstall": "pnpm simple-git-hooks"
   },
   "dependencies": {
     "dayjs": "1.11.19",
@@ -31,6 +32,8 @@
     "@antfu/eslint-config": "6.7.1",
     "eslint": "9.39.2",
     "eslint-plugin-format": "1.1.0",
+    "lint-staged": "16.2.6",
+    "simple-git-hooks": "2.13.1",
     "typescript": "5.9.3",
     "wrangler": "4.56.0"
   },
@@ -38,7 +41,14 @@
     "onlyBuiltDependencies": [
       "esbuild",
       "sharp",
+      "simple-git-hooks",
       "workerd"
     ]
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
   }
 }
