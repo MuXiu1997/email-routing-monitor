@@ -44,4 +44,4 @@ Cloudflare Worker 用于监控 Cloudflare Email Routing 的转发失败情况。
 
 ## 许可证
 
-MIT
+[MIT](LICENSE)
