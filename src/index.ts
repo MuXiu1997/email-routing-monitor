@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { DEFAULT_TIMEZONE, SUCCESS_STATUSES } from './constants'
+import { SUCCESS_STATUSES } from './constants'
 import { getEmailRoutingRawLogs, getEmailRoutingStats } from './services/cloudflare'
 import { sendResendNotification } from './services/resend'
 
@@ -44,7 +44,7 @@ async function getEmailFailures(env: Env, date: dayjs.Dayjs) {
 
 export default {
   async scheduled(_, env, ctx) {
-    const tz = DEFAULT_TIMEZONE
+    const tz = env.TIMEZONE
     const yesterday = dayjs().tz(tz).subtract(1, 'day')
 
     ctx.waitUntil((async () => {
