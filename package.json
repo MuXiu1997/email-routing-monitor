@@ -17,6 +17,8 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "wrangler dev",
+    "generate-types": "wrangler types",
+    "type-check": "wrangler types && tsc --noEmit",
     "deploy": "wrangler deploy",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -27,7 +29,6 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "6.7.1",
-    "@cloudflare/workers-types": "4.20251219.0",
     "eslint": "9.39.2",
     "eslint-plugin-format": "1.1.0",
     "typescript": "5.9.3",
@@ -36,6 +37,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
+      "sharp",
       "workerd"
     ]
   }
