@@ -1,17 +1,3 @@
-export interface Env {
-  CF_API_TOKEN: string
-  ZONE_ID: string
-  RESEND_API_KEY: string
-  RESEND_FROM: string
-  RESEND_TO: string
-  TIMEZONE?: string
-}
-
-export interface GraphQLResponse<T> {
-  data?: T
-  errors?: any[]
-}
-
 export interface EmailRoutingStats {
   viewer: {
     zones: Array<{
