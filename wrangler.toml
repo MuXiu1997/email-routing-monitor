@@ -9,3 +9,7 @@ crons = [ "30 2 * * *" ]
 ZONE_ID = "7193f0d358b5660b5e88906ff6713ea9"
 RESEND_FROM = "EmailRoutingMonitor <onboarding@resend.dev>"
 RESEND_TO = "muxiu1997@muxiu1997.com"
+
+# Secrets required (configure via `wrangler secret put` or `.dev.vars`):
+# CF_API_TOKEN - Cloudflare API token with Email Routing & Analytics read permissions
+# RESEND_API_KEY - Resend API key for sending notifications
