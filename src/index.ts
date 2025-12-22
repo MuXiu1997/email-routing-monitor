@@ -12,6 +12,7 @@ dayjs.extend(timezone)
  */
 async function getEmailFailures(env: Env, date: dayjs.Dayjs) {
   const dateStr = date.format('YYYY-MM-DD')
+  console.info(`[Monitor] Starting check for date: ${dateStr}`)
 
   const rawResult = await getEmailRoutingRawLogs(
     env.CF_API_TOKEN,
@@ -26,6 +27,8 @@ async function getEmailFailures(env: Env, date: dayjs.Dayjs) {
     return (log.errorDetail && log.errorDetail !== '') || log.status !== 'delivered'
   })
 
+  console.info(`[Monitor] Processed ${logs.length} logs, found ${failures.length} failures.`)
+
   return {
     totalFailed: failures.length,
     failures,
@@ -35,13 +38,22 @@ async function getEmailFailures(env: Env, date: dayjs.Dayjs) {
 
 export default {
   async scheduled(_, env, ctx) {
+    console.log('[Cron] Scheduled trigger started')
     const tz = env.TIMEZONE
     const yesterday = dayjs().tz(tz).subtract(1, 'day')
 
     ctx.waitUntil((async () => {
-      const { totalFailed, failures, dateStr } = await getEmailFailures(env, yesterday)
-      if (totalFailed > 0) {
-        await sendResendNotification(env, failures, totalFailed, dateStr)
+      try {
+        const { totalFailed, failures, dateStr } = await getEmailFailures(env, yesterday)
+        if (totalFailed > 0) {
+          await sendResendNotification(env, failures, totalFailed, dateStr)
+        }
+        else {
+          console.info(`[Monitor] No failures found for ${dateStr}.`)
+        }
+      }
+      catch (error) {
+        console.error('[Monitor] Critical error during execution:', error)
       }
     })())
   },

@@ -10,7 +10,9 @@ export async function sendResendNotification(
   const tableHtml = renderFailureTable(failures)
   const htmlBody = renderFullHtml(tableHtml, dateStr, totalFailed)
 
-  await fetch('https://api.resend.com/emails', {
+  console.info(`[Resend] Sending notification for ${totalFailed} failures to ${env.RESEND_TO}`)
+
+  const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${env.RESEND_API_KEY}`,
@@ -23,4 +25,13 @@ export async function sendResendNotification(
       html: htmlBody,
     }),
   })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error(`[Resend] Failed to send email: ${response.status} ${errorText}`)
+    throw new Error(`Resend API error: ${response.status} ${errorText}`)
+  }
+
+  const data = await response.json() as any
+  console.info(`[Resend] Email sent successfully. ID: ${data.id}`)
 }

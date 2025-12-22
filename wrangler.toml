@@ -1,9 +1,13 @@
+# :schema node_modules/wrangler/config-schema.json
 name = "email-routing-monitor"
 main = "src/index.ts"
 compatibility_date = "2024-12-19"
 
 [triggers]
 crons = [ "30 2 * * *" ] # Run daily at 10:30 AM (UTC+8 / Asia/Shanghai). Cron expression is in UTC.
+
+[observability]
+enabled = true
 
 [vars]
 ZONE_ID = "7193f0d358b5660b5e88906ff6713ea9"

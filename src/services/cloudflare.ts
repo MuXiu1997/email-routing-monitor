@@ -34,6 +34,7 @@ export async function getEmailRoutingRawLogs(
   datetimeStart: string,
   datetimeEnd: string,
 ) {
+  console.info(`[Cloudflare] Fetching logs between ${datetimeStart} and ${datetimeEnd}`)
   const query = `
     query GetEmailRoutingRawLogs($zoneTag: String!, $datetimeStart: DateTime!, $datetimeEnd: DateTime!) {
       viewer {
@@ -65,9 +66,16 @@ export async function getEmailRoutingRawLogs(
     }
   `
 
-  return queryGraphQL<EmailRoutingLogs>(apiToken, query, {
-    zoneTag,
-    datetimeStart,
-    datetimeEnd,
-  })
+  try {
+    const result = await queryGraphQL<EmailRoutingLogs>(apiToken, query, {
+      zoneTag,
+      datetimeStart,
+      datetimeEnd,
+    })
+    return result
+  }
+  catch (error) {
+    console.error('[Cloudflare] API Query Failed:', error)
+    throw error
+  }
 }
