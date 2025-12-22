@@ -8,32 +8,84 @@ export function renderFailureTable(failures: EmailRoutingLog[], totalFailed: num
     return '<p style="color: green;">✅ 所有邮件均转发成功。</p>'
   }
 
-  const rows = failures.map(
-    f => `
-    <tr>
-      <td style="padding:8px;border:1px solid #ddd;">${f.datetime}</td>
-      <td style="padding:8px;border:1px solid #ddd;">${f.from}</td>
-      <td style="padding:8px;border:1px solid #ddd;">${f.to}</td>
-      <td style="padding:8px;border:1px solid #ddd;">${f.subject || '(无主题)'}</td>
-      <td style="padding:8px;border:1px solid #ddd;color:red;">${f.status}</td>
-      <td style="padding:8px;border:1px solid #ddd;">${f.errorDetail || '-'}</td>
-    </tr>`,
-  ).join('')
+  const cards = failures.map((f) => {
+    const isSpam = f.isSpam === 1
+    const isSuccess = f.status === 'delivered'
+    const statusColor = isSuccess ? '#2e7d32' : (isSpam ? '#ffa000' : '#d32f2f')
+    const borderColor = isSuccess ? '#c8e6c9' : (isSpam ? '#ffecb3' : '#ffcdd2')
+    const bgColor = isSuccess ? '#f1f8e9' : (isSpam ? '#fffdf7' : '#fff8f8')
 
-  return `
-  <table style="border-collapse:collapse;width:100%;">
-    <thead>
-      <tr style="background:#f44336;color:white;">
-        <th style="padding:12px 8px;text-align:left;">时间</th>
-        <th style="padding:12px 8px;text-align:left;">发件人</th>
-        <th style="padding:12px 8px;text-align:left;">收件人</th>
-        <th style="padding:12px 8px;text-align:left;">主题</th>
-        <th style="padding:12px 8px;text-align:left;">状态</th>
-        <th style="padding:12px 8px;text-align:left;">错误详情</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>`
+    // 各种验证状态的标签
+    const renderBadge = (label: string, value: string) => {
+      const isPass = value.toLowerCase() === 'pass'
+      const color = isPass ? '#2e7d32' : '#d32f2f'
+      const bg = isPass ? '#e8f5e9' : '#ffebee'
+      return `<span style="display:inline-block;padding:2px 6px;border-radius:4px;font-size:11px;font-weight:bold;margin-right:4px;background:${bg};color:${color};text-transform:uppercase;">${label}:${value}</span>`
+    }
+
+    const allFields = Object.entries(f)
+      .map(([key, value]) => `
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:6px 0;color:#888;font-size:12px;width:120px;vertical-align:top;">${key}</td>
+          <td style="padding:6px 0;font-family:monospace;font-size:12px;word-break:break-all;">${value === '' ? '<span style="color:#ccc;">(empty)</span>' : value}</td>
+        </tr>
+      `)
+      .join('')
+
+    return `
+    <div style="border:1px solid ${borderColor}; border-radius:12px; margin-bottom:20px; overflow:hidden; background:${bgColor}; box-shadow:0 2px 4px rgba(0,0,0,0.05);">
+      <div style="padding:16px;">
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <span style="background:${statusColor}; color:white; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:bold; text-transform:uppercase;">${f.status}</span>
+            ${isSpam ? '<span style="margin-left:8px; color:#ffa000; font-size:12px; font-weight:bold;">⚠️ SPAM</span>' : ''}
+          </div>
+          <span style="color:#999; font-size:12px;">${f.datetime}</span>
+        </div>
+
+        <!-- Main Info -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:16px; font-weight:bold; color:#333; margin-bottom:4px;">${f.subject || '(无主题)'}</div>
+          <div style="font-size:14px; color:#555;">
+            <span style="color:#888;">From:</span> ${f.from.replace('<', '&lt;').replace('>', '&gt;')}
+          </div>
+          <div style="font-size:14px; color:#555;">
+            <span style="color:#888;">To:</span> ${f.to}
+          </div>
+        </div>
+
+        <!-- Security Badges -->
+        <div style="margin-bottom:12px;">
+          ${renderBadge('SPF', f.spf)}
+          ${renderBadge('DKIM', f.dkim)}
+          ${renderBadge('DMARC', f.dmarc)}
+        </div>
+
+        <!-- Error Detail -->
+        ${f.errorDetail
+          ? `
+        <div style="margin-top:12px; padding:12px; background:#fff; border:1px solid ${borderColor}; border-left:4px solid ${statusColor}; border-radius:6px; font-size:13px; color:#444; line-height:1.4;">
+          <strong>Error:</strong> ${f.errorDetail}
+        </div>`
+          : ''}
+      </div>
+
+      <!-- Raw Data Toggle -->
+      <details style="border-top:1px solid ${borderColor};">
+        <summary style="padding:10px 16px; cursor:pointer; color:${statusColor}; font-size:13px; font-weight:bold; outline:none; background:rgba(0,0,0,0.02);">
+          展开原始诊断数据 (Session: ${f.sessionId})
+        </summary>
+        <div style="padding:0 16px 16px;">
+          <table style="width:100%; border-collapse:collapse;">
+            ${allFields}
+          </table>
+        </div>
+      </details>
+    </div>`
+  }).join('')
+
+  return `<div>${cards}</div>`
 }
 
 export function renderFullHtml(content: string, dateStr: string, totalFailed: number) {

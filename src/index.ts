@@ -1,8 +1,7 @@
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { SUCCESS_STATUSES } from './constants'
-import { getEmailRoutingRawLogs, getEmailRoutingStats } from './services/cloudflare'
+import { getEmailRoutingRawLogs } from './services/cloudflare'
 import { sendResendNotification } from './services/resend'
 
 dayjs.extend(utc)
@@ -14,21 +13,6 @@ dayjs.extend(timezone)
 async function getEmailFailures(env: Env, date: dayjs.Dayjs) {
   const dateStr = date.format('YYYY-MM-DD')
 
-  const statsResult = await getEmailRoutingStats(env.CF_API_TOKEN, env.ZONE_ID, dateStr)
-
-  const stats = statsResult.viewer?.zones[0]?.emailRoutingAdaptiveGroups || []
-
-  let totalFailed = 0
-  for (const s of stats) {
-    if (!SUCCESS_STATUSES.includes(s.dimensions.status)) {
-      totalFailed += s.count
-    }
-  }
-
-  if (totalFailed === 0) {
-    return { totalFailed: 0, failures: [], dateStr }
-  }
-
   const rawResult = await getEmailRoutingRawLogs(
     env.CF_API_TOKEN,
     env.ZONE_ID,
@@ -37,9 +21,16 @@ async function getEmailFailures(env: Env, date: dayjs.Dayjs) {
   )
 
   const logs = rawResult.viewer?.zones[0]?.emailRoutingAdaptive || []
-  const failures = logs.filter(log => !SUCCESS_STATUSES.includes(log.status))
+  const failures = logs.filter((log) => {
+    // Condition: errorDetail is not empty, or status is not delivered
+    return (log.errorDetail && log.errorDetail !== '') || log.status !== 'delivered'
+  })
 
-  return { totalFailed, failures, dateStr }
+  return {
+    totalFailed: failures.length,
+    failures,
+    dateStr,
+  }
 }
 
 export default {

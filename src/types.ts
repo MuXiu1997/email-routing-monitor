@@ -1,21 +1,24 @@
-export interface EmailRoutingStats {
-  viewer: {
-    zones: Array<{
-      emailRoutingAdaptiveGroups: Array<{
-        count: number
-        dimensions: { status: string }
-      }>
-    }>
-  }
-}
-
 export interface EmailRoutingLog {
+  action: string
+  arc: string
   datetime: string
-  from: string
-  to: string
-  subject: string
-  status: string
+  dkim: string
+  dmarc: string
   errorDetail: string
+  eventType: string
+  from: string
+  isNDR: number
+  isSpam: number
+  messageId: string
+  ruleMatched: string
+  sampleInterval: number
+  sessionId: string
+  spamScore: number
+  spamThreshold: number
+  spf: string
+  status: string
+  subject: string
+  to: string
 }
 
 export interface EmailRoutingLogs {
