@@ -24,7 +24,12 @@ async function getEmailFailures(env: Env, date: dayjs.Dayjs) {
   const logs = rawResult.viewer?.zones[0]?.emailRoutingAdaptive || []
   const failures = logs.filter((log) => {
     // Condition: errorDetail is not empty, or status is not delivered
-    return (log.errorDetail && log.errorDetail !== '') || log.status !== 'delivered'
+    const isPotentiallyFailed = (log.errorDetail && log.errorDetail !== '') || log.status !== 'delivered'
+
+    // Exception: action is worker, status is dropped, and errorDetail is empty
+    const isIgnoredWorkerDrop = log.action === 'worker' && log.status === 'dropped' && (!log.errorDetail || log.errorDetail === '')
+
+    return isPotentiallyFailed && !isIgnoredWorkerDrop
   })
 
   console.info(`[Monitor] Processed ${logs.length} logs, found ${failures.length} failures.`)
