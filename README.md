@@ -15,6 +15,7 @@ Cloudflare Worker 用于监控 Cloudflare Email Routing 的转发失败情况。
 ### 环境变量 (Variables)
 
 - `ZONE_ID`: Cloudflare 域名 Zone ID
+- `TIMEZONE`: 时区（例如 `Asia/Shanghai`），用于计算“昨日”的时间范围
 - `RESEND_FROM`: 发件人地址（需在 Resend 验证）
 - `RESEND_TO`: 接收通知的邮箱地址
 
@@ -37,7 +38,13 @@ Cloudflare Worker 用于监控 Cloudflare Email Routing 的转发失败情况。
    pnpm dev
    ```
 
-3. 部署：
+3. 邮件模板预览：
+
+   ```bash
+   pnpm dev:email
+   ```
+
+4. 部署：
    ```bash
    pnpm deploy
    ```
